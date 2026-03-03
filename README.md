@@ -1,30 +1,38 @@
-# PF2E Character Inventory + Shop (Owlbear Rodeo Extension)
+# PF2E Inventory + Shop (Owlbear Rodeo Extension)
 
-A lightweight Owlbear Rodeo extension panel for Pathfinder 2E with per-character inventory and currency, plus global and NPC-driven shops.
+Pathfinder 2E inventory/shop extension with per-character persistence, GM controls, NPC profile cards, and a Markdown-based item compendium.
 
-## Features
+## Implemented features
 
-- Per-character GP/SP/CP and inventory persistence (instead of per-player-only buckets).
-- Optional character-to-connected-player sync via linked player ID.
-- NPCs with inventory that can be toggled into fully usable shops.
-- Global shop and NPC shops support custom header image URLs.
-- Character profile image URL for each character.
-- Buy/sell economy helpers:
-  - Buy from active shop at listed value.
-  - Sell from active character inventory at half value into active shop stock.
-- Data persisted to Owlbear room metadata.
+- Per-character coins/inventory persisted in Owlbear room metadata.
+- GM mode for viewing/editing all PCs and NPCs.
+- GM player-mapping UI for linking PCs to connected players.
+- NPC profile cards that players can open from the NPC directory.
+- NPC card can open into shop only if `NPC has shop` is enabled.
+- Character hero layout with **large portrait overlay** and **faded banner bottom**.
+- Shop + inventory item type icons (emoji by default) with optional per-item icon image URL override.
+- Local demo fallback mode (for standalone dev outside Owlbear) after a short timeout.
+- Repo-based compendium under `compendium/items/*.md` with in-app “Add to Active Shop”.
 
-## Getting started
+## Compendium format
+
+Each item is a Markdown file:
+
+```md
+name: Longsword
+type: weapon
+price_cp: 1000
+bulk: 1
+icon: ⚔️
+image:
+```
+
+`type` supports: `weapon`, `armor`, `consumable`, `gear`, `treasure`, `tool`.
+
+## Development
 
 ```bash
 npm install
 npm run dev
-```
-
-Then load the extension URL in Owlbear Rodeo's extension manager.
-
-## Build
-
-```bash
 npm run build
 ```
