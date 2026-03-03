@@ -145,7 +145,7 @@ const npcModal = document.getElementById("npc-modal")!;
 
 function parseCompendiumFile(path: string, markdown: string): CompendiumItem | null {
   const lines = markdown.split("\n");
-  const take = (key: string): string => lines.find((line) => line.startsWith(`${key}:`))?.split(":")[1]?.trim() ?? "";
+  const take = (key: string): string => { const line = lines.find((l) => l.startsWith(`${key}:`)); return line ? line.slice(key.length + 1).trim() : ""; };
   const name = take("name");
   const type = take("type") as ItemType;
   if (!name || !type || !(type in ITEM_TYPE_ICON)) return null;
@@ -168,6 +168,7 @@ function cpToCoin(totalCp: number): CoinPouch {
 function formatCoins(cp: number) { const c = cpToCoin(cp); return `${c.gp} gp ${c.sp} sp ${c.cp} cp`; }
 function setMessage(text: string, isError = false) { messageEl.textContent = text; messageEl.style.color = isError ? "#fca5a5" : "#86efac"; }
 function escapeHtml(v: string) { return v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;"); }
+function safeCssUrl(url: string): string { try { const p = new URL(url); return (p.protocol === "http:" || p.protocol === "https:") ? url : ""; } catch { return ""; } }
 function getCharacters() { return Object.values(state.characters); }
 function canUseGmMode() { return userRole === "GM"; }
 function isGmModeActive() { return canUseGmMode() && gmModeEnabled; }
@@ -201,6 +202,10 @@ function readState(metadata: Metadata) {
   for (const c of Object.values(state.characters)) {
     c.bannerImage ??= "";
     c.bio ??= "";
+    for (const item of c.inventory) {
+      (item as InventoryItem).itemType ??= "gear";
+      (item as InventoryItem).iconOverrideUrl ??= undefined;
+    }
   }
   ensureState();
 }
@@ -219,7 +224,7 @@ function renderNpcModal() {
     <div class="modal-backdrop" data-close-npc-modal="1"></div>
     <div class="modal-card">
       <button class="modal-close" data-close-npc-modal="1">✕</button>
-      <div class="hero-banner" style="background-image:url('${escapeHtml(npc.bannerImage || npc.shopHeaderImage)}')">
+      <div class="hero-banner" style="background-image:url('${safeCssUrl(npc.bannerImage || npc.shopHeaderImage)}')">
         <div class="hero-fade"></div>
         ${npc.profileImage ? `<img class="hero-portrait" src="${escapeHtml(npc.profileImage)}" alt="npc"/>` : ""}
       </div>
@@ -273,7 +278,7 @@ function render() {
 
   totalBulkEl.textContent = `Bulk ${active.inventory.reduce((sum, i) => sum + i.quantity * i.bulk, 0).toFixed(1)}`;
   characterHero.innerHTML = `
-    <div class="hero-banner" style="background-image:url('${escapeHtml(active.bannerImage || active.shopHeaderImage)}')">
+    <div class="hero-banner" style="background-image:url('${safeCssUrl(active.bannerImage || active.shopHeaderImage)}')">
       <div class="hero-fade"></div>
       ${active.profileImage ? `<img class="hero-portrait" src="${escapeHtml(active.profileImage)}" alt="character"/>` : ""}
     </div>
